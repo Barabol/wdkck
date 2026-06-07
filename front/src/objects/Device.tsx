@@ -1,11 +1,11 @@
 export class Device {
 	id: number;
 	name: string;
-	status: ("online" | "warning" | "offline");
-	temp: number;
-	cpu: number;
-	mem: number;
-	uptime: string;
+	status?: ("online" | "warning" | "offline");
+	temp?: number;
+	cpu?: number;
+	mem?: number;
+	uptime?: string;
 	ip: string;
 	constructor(id: number, name: string, status: ("online" | "warning" | "offline"),
 		temp: number, cpu: number, mem: number, uptime: string, ip: string) {
@@ -19,6 +19,7 @@ export class Device {
 		this.ip = ip;
 	}
 	statusStyle() {
+		console.log(this.status)
 		switch (this.status) {
 			case "online":
 				return { backgroundColor: "#22c55e", color: "white" };

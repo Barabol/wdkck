@@ -1,0 +1,7 @@
+{
+	"devices":[
+		{ "name": "device 1", "endpoint": "/api" },
+		{ "name": "device 2", "endpoint": "/api" },
+		{ "name": "offline", "endpoint": "8.8.8.8"}
+	]
+}

@@ -2,6 +2,7 @@ import type { WidgetData } from "../objects/WidgetData";
 import { LineChartWidget } from "./LineChartWidget";
 import { StearingWidget } from "./StearingWidget";
 import { CameraWidget } from "./CameraWidget";
+import Joystick from "./Joystick";
 
 
 export function Widgets(ip: string): WidgetData[] {
@@ -17,7 +18,22 @@ export function Widgets(ip: string): WidgetData[] {
 			y: 20,
 			width: 100,
 			ip: ip,
+			title: "test widget",
 			height: 100
+		},
+		{
+			id: "Joystickmv",
+			title: "Stearing",
+			content: (
+				<div>
+					<Joystick endpoint={ip + "/move"}></Joystick>
+				</div>
+			),
+			x: 20,
+			y: 20,
+			width: 180,
+			ip: ip,
+			height: 220
 		},
 		{
 			id: "camera",
@@ -26,9 +42,10 @@ export function Widgets(ip: string): WidgetData[] {
 			),
 			x: 20,
 			y: 20,
-			width: 100,
+			width: 280,
 			ip: ip,
-			height: 100
+			title: "cammera",
+			height: 220
 		},
 		{
 			id: "stearing",
@@ -51,7 +68,9 @@ export function Widgets(ip: string): WidgetData[] {
 				<LineChartWidget
 					endpoint={ip + "/battery"}
 					lineColor="green"
-					dotColor="red"
+					dotColor="green"
+					xLabel="time"
+					yLabel="battery"
 				>
 				</LineChartWidget>
 			),
@@ -60,6 +79,6 @@ export function Widgets(ip: string): WidgetData[] {
 			width: 400,
 			ip: ip,
 			height: 300
-		}
+		},
 	]
 }

@@ -5,12 +5,22 @@ export const StearingWidget: React.FC<StearingWidgetType> = (data) => {
 
 	function handleStart(way: string) {
 		console.log("start");
-		fetch(`${data.endpoint}/${way}`, { method: "POST", body: "test " + way })
+		try {
+			fetch(`${data.endpoint}/${way}`, { method: "POST", body: "test " + way })
+		}
+		catch (e) {
+			console.log("unable to connect to server")
+		}
 	};
 
 	function handleEnd(way: string) {
 		console.log("stop");
-		fetch(`${data.endpoint}/${way}`, { method: "POST", body: "test1 " + way })
+		try {
+			fetch(`${data.endpoint}/${way}`, { method: "POST", body: "test1 " + way })
+		}
+		catch (e) {
+			console.log("unable to connect to server")
+		}
 	};
 
 	return (

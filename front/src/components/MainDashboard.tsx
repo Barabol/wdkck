@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type Device } from "../objects/Device";
 import WidgetCanvas from "./WidgetCanvas";
 import { Widgets } from "../widgets/Widgets";
@@ -7,10 +7,22 @@ type DeviceCardProps = {
 	device: Device;
 	onClick: (device: Device) => void;
 };
+
 type MainDashboardProps = {
 	devices?: Device[];
 };
-
+function getStatusStyle(status?: "online" | "warning" | "offline") {
+	switch (status) {
+		case "online":
+			return { backgroundColor: "#22c55e", color: "white" };
+		case "warning":
+			return { backgroundColor: "#FFAF00", color: "white" };
+		case "offline":
+			return { backgroundColor: "#ef4444", color: "white" };
+		default:
+			return { backgroundColor: "#9ca3af", color: "white" };
+	}
+}
 function DeviceCard({ device, onClick }: DeviceCardProps) {
 	return (
 		<div
@@ -37,7 +49,6 @@ function DeviceCard({ device, onClick }: DeviceCardProps) {
           border-radius: 50%;
           display: inline-block;
           margin-right: 6px;
-          margin-right: 6px;
           animation: blink 2s infinite;
         }
       `}</style>
@@ -52,18 +63,8 @@ function DeviceCard({ device, onClick }: DeviceCardProps) {
 			>
 				<h2 style={{ fontSize: "18px", margin: 0 }}>{device.name}</h2>
 
-				<span
-					style={{
-						display: "flex",
-						alignItems: "center",
-						fontSize: "12px",
-						fontWeight: 500,
-					}}
-				>
-					<span
-						className="dot"
-						style={device.statusStyle()}
-					/>
+				<span style={{ display: "flex", alignItems: "center", fontSize: "12px", fontWeight: 500 }}>
+					<span className="dot" style={getStatusStyle(device.status)} />
 					{device.status}
 				</span>
 			</div>
@@ -76,62 +77,101 @@ function DeviceCard({ device, onClick }: DeviceCardProps) {
 					fontSize: "13px",
 				}}
 			>
-				<div>
-					<strong>Temp:</strong> {device.temp}°C
-				</div>
-
-				<div>
-					<strong>CPU:</strong> {device.cpu}%
-				</div>
-
-				<div>
-					<strong>RAM:</strong> {device.mem}%
-				</div>
-
-				<div>
-					<strong>Uptime:</strong> {device.uptime}
-				</div>
+				<div><strong>Temp:</strong> {device.temp}°C</div>
+				<div><strong>CPU:</strong> {device.cpu}%</div>
+				<div><strong>RAM:</strong> {device.mem}%</div>
+				<div><strong>Uptime:</strong> {device.uptime}</div>
 			</div>
 		</div>
 	);
 }
+
 export default function MainDashboard({ devices = [] }: MainDashboardProps) {
+	const [deviceList, setDeviceList] = useState<Device[]>([]);
 	const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+
+	useEffect(() => {
+		setDeviceList(devices);
+	}, [devices]);
+
+	useEffect(() => {
+		if (!deviceList.length) return;
+
+		const fetchStats = async () => {
+			const updated = await Promise.all(
+				deviceList.map(async (device) => {
+					try {
+						const res = await fetch(`${device.ip}/stat`);
+						if (!res.ok) throw new Error("Request failed");
+
+						const data = await res.json();
+
+						return {
+							...device,
+							status: data.warning ? "warning" : "online",
+							temp: data.temp,
+							cpu: data.cpu,
+							mem: data.mem,
+							uptime: data.uptime,
+						};
+					} catch {
+						return {
+							...device,
+							status: "offline",
+							temp: 0,
+							cpu: 0,
+							mem: 0,
+							uptime: "none",
+						};
+					}
+				})
+			);
+
+			setDeviceList(updated);
+		};
+
+		fetchStats();
+		const interval = setInterval(fetchStats, 1000);
+
+		return () => clearInterval(interval);
+	}, [deviceList.length]);
+
 	if (selectedDevice) {
 		return (
 			<div>
 				<button
-					onClick={() => { setSelectedDevice(null) }}
+					onClick={() => setSelectedDevice(null)}
 					style={{ float: "left" }}
-				>return</button>
-				<WidgetCanvas initialWidgets={Widgets(selectedDevice.ip)}>
-				</WidgetCanvas>
+				>
+					return
+				</button>
+
+				<WidgetCanvas initialWidgets={Widgets(selectedDevice.ip)} />
 			</div>
 		);
 	}
-	else
-		return (
-			<div style={{ minHeight: "100vh", padding: "24px" }}>
-				<h1 style={{ fontSize: "28px", marginBottom: "24px" }}>System IoT / MC</h1>
 
-				<div
-					style={{
-						display: "grid",
-						gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-						gap: "16px",
-					}}
-				>
-					{devices.map((device) => (
-						<DeviceCard
-							key={device.id}
-							device={device}
-							onClick={(d) => {
-								setSelectedDevice(d);
-								console.log(d.name);
-							}}
-						/>
-					))}
-				</div>
+	return (
+		<div style={{ minHeight: "100vh", padding: "24px" }}>
+			<h1 style={{ fontSize: "28px", marginBottom: "24px" }}>
+				Skipi Controller
+			</h1>
+
+			<div
+				style={{
+					display: "grid",
+					gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+					gap: "16px",
+				}}
+			>
+				{deviceList.map((device) => (
+					<DeviceCard
+						key={device.id}
+						device={device}
+						onClick={setSelectedDevice}
+					/>
+				))}
 			</div>
-		);
+		</div>
+	);
 }
