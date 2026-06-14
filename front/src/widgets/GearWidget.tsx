@@ -13,16 +13,6 @@ export const GearWidget: React.FC<StearingWidgetType> = (data) => {
 		}
 	};
 
-	function handleEnd(way: string) {
-		console.log("stop");
-		try {
-			fetch(`${data.endpoint}/${way}`, { method: "POST", body: "test1 " + way })
-		}
-		catch (e) {
-			console.log("unable to connect to server")
-		}
-	};
-
 	return (
 		<div style={
 			{

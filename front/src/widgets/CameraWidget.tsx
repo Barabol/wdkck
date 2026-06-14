@@ -7,13 +7,12 @@ type CameraWidgetType = {
 
 export const CameraWidget: React.FC<CameraWidgetType> = ({
 	endpoint,
-	intervalMs = 1000,
-}) => {
-	const [src, setSrc] = useState(endpoint);
+	intervalMs = 1000 / 10}) => {
+	const [src, setSrc] = useState("");
 
 	useEffect(() => {
 		const id = setInterval(() => {
-			const cacheBustedUrl = `${endpoint}`;
+			const cacheBustedUrl = `${endpoint}?t=${Date.now()}`;
 			setSrc(cacheBustedUrl);
 		}, intervalMs);
 
@@ -23,7 +22,7 @@ export const CameraWidget: React.FC<CameraWidgetType> = ({
 	return (
 		<img
 			src={src}
-			alt="unable to get image"
+			alt="camera stream"
 			style={{
 				width: "100%",
 				height: "100%",

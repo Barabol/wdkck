@@ -1,8 +1,13 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 import serial
 import psutil
 import time
 from datetime import datetime
+import cv2
+import threading
+from ultralytics import YOLO
+
+model = YOLO("./yolo26n.pt")
 
 app = FastAPI()
 
@@ -152,3 +157,104 @@ def status():
         "mem": mem,
         "uptime": uptime
     }
+camera = cv2.VideoCapture(0)
+
+latest_frame = None
+latest_frame_cpy = None
+yolo_frame = None          # annotated frame or detection result
+yolo_result = None         # optional: detections
+lock = threading.Lock()
+FPS = 15
+FRAME_TIME = 1.0 / FPS
+
+
+def capture_loops():
+    global latest_frame
+
+    while True:
+        start = time.time()
+
+        ret, frame = camera.read()
+
+        if ret:
+            with lock:
+                latest_frame = frame.copy()   # RAW FRAME ONLY
+
+        elapsed = time.time() - start
+        sleep_time = FRAME_TIME - elapsed
+
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+
+def yolo_loop():
+    global yolo_frame, yolo_result
+
+    while True:
+        with lock:
+            if latest_frame is None:
+                continue
+            frame = latest_frame.copy()
+
+        results = model(frame, verbose=False)
+        result = results[0]
+
+        annotated = result.plot()
+
+        detections = []
+
+        for box in result.boxes:
+            cls_id = int(box.cls[0])
+            conf = float(box.conf[0])
+
+            detections.append({
+                "class": model.names[cls_id],
+                "confidence": round(conf, 3)
+            })
+
+        with lock:
+            yolo_frame = annotated
+            yolo_result = detections
+
+        time.sleep(0.05)
+
+
+@app.on_event("startup")
+def start_camera_thread():
+    thread = threading.Thread(target=capture_loops, daemon=True)
+    thread.start()
+    threading.Thread(target=yolo_loop, daemon=True).start()
+
+@app.get("/api/cam")
+def get_frame():
+    with lock:
+        if latest_frame is None:
+            return {"error": "No frame available yet"}
+
+        _, buffer = cv2.imencode(".jpg", latest_frame)
+
+        return Response(
+            content=buffer.tobytes(),
+            media_type="image/jpeg"
+        )
+
+@app.get("/api/aicam")
+def get_aiframe():
+    with lock:
+        if yolo_frame is None:
+            return {"error": "No YOLO frame available yet"}
+
+        _, buffer = cv2.imencode(".jpg", yolo_frame)
+
+        return Response(
+            content=buffer.tobytes(),
+            media_type="image/jpeg"
+        )
+
+@app.get("/api/aidetect")
+def get_aidetect():
+    global yolo_result
+    with lock:
+        if yolo_result is None:
+            return {"error": "No YOLO frame available yet"}
+        return  yolo_result
+        

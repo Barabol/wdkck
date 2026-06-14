@@ -1,3 +1,6 @@
-"fastapi[standard]"
+'"fastapi[standard]"'
 psutil
 serial
+ultralytics
+opencv-python 
+numpy
