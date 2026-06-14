@@ -157,23 +157,34 @@ def status():
         "mem": mem,
         "uptime": uptime
     }
-camera1 = cv2.VideoCapture(0)
+def find_cameras(max_index=4):
+    found = []
 
-camera2 = None
+    for i in range(max_index):
+        cap = cv2.VideoCapture(i)
 
-for x in range(1, 10):
-    c = cv2.VideoCapture(x)
+        if cap.isOpened():
+            ret, frame = cap.read()
+            if ret and frame is not None:
+                found.append(i)
 
-    if c.isOpened():
-        camera2 = c
-        print("Camera 2 found at index:", x)
-        break
-    else:
-        c.release()
+        cap.release()
 
-if camera2 == None:
+    return found
+
+
+devices = find_cameras()
+
+print("Detected cameras:", devices)
+
+if len(devices) >= 2:
+    camera1 = cv2.VideoCapture(devices[0])
+    camera2 = cv2.VideoCapture(devices[1])
+elif len(devices) == 1:
+    camera1 = cv2.VideoCapture(devices[0])
     camera2 = camera1
-
+else:
+    raise RuntimeError("No cameras found")
 camera = camera1
 
 latest_frame = None
