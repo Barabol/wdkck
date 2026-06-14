@@ -6,6 +6,7 @@ from datetime import datetime
 import cv2
 import threading
 from ultralytics import YOLO
+import glob
 
 model = YOLO("./yolo26n.pt")
 
@@ -157,20 +158,19 @@ def status():
         "mem": mem,
         "uptime": uptime
     }
-def find_cameras(max_index=4):
-    found = []
+def find_cameras():
+    devices = sorted(glob.glob("/dev/video*"))
+    working = []
 
-    for i in range(max_index):
-        cap = cv2.VideoCapture(i)
-
+    for dev in devices:
+        cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
         if cap.isOpened():
             ret, frame = cap.read()
-            if ret and frame is not None:
-                found.append(i)
-
+            if ret:
+                working.append(dev)
         cap.release()
 
-    return found
+    return working
 
 
 devices = find_cameras()
