@@ -6,7 +6,7 @@ from datetime import datetime
 import cv2
 import threading
 from ultralytics import YOLO
-
+time.sleep(300)
 model = YOLO("./yolo26n.pt")
 
 app = FastAPI()
