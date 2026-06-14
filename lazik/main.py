@@ -160,9 +160,12 @@ def status():
 camera1 = cv2.VideoCapture(0)
 camera2 = camera1
 for x in range(3):
-    c = cv2.VideoCapture(x+1)
-    if(c.isOpened()):
-        camera2 = c
+    try: 
+        c = cv2.VideoCapture(x+1)
+        if(c.isOpened()):
+            camera2 = c
+    except:
+        print("no cam"+(x+1))
 camera = camera1
 
 latest_frame = None
