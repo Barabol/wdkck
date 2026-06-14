@@ -158,7 +158,7 @@ def status():
         "uptime": uptime
     }
 camera1 = cv2.VideoCapture(0)
-camera2 = cv2.VideoCapture(0)
+camera2 = camera1
 for x in range(3):
     c = cv2.VideoCapture(x+1)
     if(c.isOpened()):
