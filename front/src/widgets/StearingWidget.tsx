@@ -46,10 +46,10 @@ export const StearingWidget: React.FC<StearingWidgetType> = (data) => {
 			<button style={{
 				userSelect: "none",
 				WebkitUserSelect: "none",
-				width: "30%",
+				width: "25%",
 				height: "50px",
 				float: "left",
-				marginLeft: "10%"
+				marginBottom: "10px",
 			}}
 				onPointerDown={() => { handleStart("left") }}
 				onPointerLeave={() => { handleEnd("stop") }}
@@ -59,10 +59,22 @@ export const StearingWidget: React.FC<StearingWidgetType> = (data) => {
 			<button style={{
 				userSelect: "none",
 				WebkitUserSelect: "none",
-				width: "30%",
+				width: "25%",
+				height: "50px",
+				marginLeft: "35px",
+				float: "left",
+			}}
+				onPointerDown={() => { handleStart("down") }}
+				onPointerLeave={() => { handleEnd("stop") }}
+			>
+				⬇️
+			</button>
+			<button style={{
+				userSelect: "none",
+				WebkitUserSelect: "none",
+				width: "25%",
 				height: "50px",
 				float: "right",
-				marginRight: "10%"
 			}}
 				onPointerDown={() => { handleStart("right") }}
 				onPointerLeave={() => { handleEnd("stop") }}

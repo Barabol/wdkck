@@ -3,6 +3,7 @@ import { LineChartWidget } from "./LineChartWidget";
 import { StearingWidget } from "./StearingWidget";
 import { CameraWidget } from "./CameraWidget";
 import Joystick from "./Joystick";
+import { GearWidget } from "./GearWidget";
 
 
 export function Widgets(ip: string): WidgetData[] {
@@ -53,6 +54,18 @@ export function Widgets(ip: string): WidgetData[] {
 			content: (
 				<StearingWidget endpoint={ip} >
 				</StearingWidget>
+			),
+			x: 20,
+			y: 20,
+			width: 300,
+			ip: ip,
+			height: 230
+		},
+		{
+			id: "gear",
+			title: "gear System",
+			content: (
+				<GearWidget endpoint={ip} />
 			),
 			x: 20,
 			y: 20,
