@@ -158,14 +158,22 @@ def status():
         "uptime": uptime
     }
 camera1 = cv2.VideoCapture(0)
-camera2 = camera1
-for x in range(3):
-    try: 
-        c = cv2.VideoCapture(x+1)
-        if(c.isOpened()):
-            camera2 = c
-    except:
-        print("no cam"+(x+1))
+
+camera2 = None
+
+for x in range(1, 10):
+    c = cv2.VideoCapture(x)
+
+    if c.isOpened():
+        camera2 = c
+        print("Camera 2 found at index:", x)
+        break
+    else:
+        c.release()
+
+if camera2 == None:
+    camera2 = camera1
+
 camera = camera1
 
 latest_frame = None
