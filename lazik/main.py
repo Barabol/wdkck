@@ -158,7 +158,7 @@ def status():
         "uptime": uptime
     }
 
-camera = cv2.VideoCapture(0)
+camera = None
 
 latest_frame = None
 latest_frame_cpy = None
