@@ -85,7 +85,7 @@ def up():
             status_code=500,
             detail="Serial port not connected"
         )
-    ser.write("a".encode("utf-8"))
+    ser.write("e".encode("utf-8"))
     ser.flush()
 
     return {
@@ -99,7 +99,7 @@ def down():
             status_code=500,
             detail="Serial port not connected"
         )
-    ser.write("d".encode("utf-8"))
+    ser.write("q".encode("utf-8"))
     ser.flush()
 
     return {
