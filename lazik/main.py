@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Query, Response
 import serial
 import psutil
 import time
@@ -267,3 +267,8 @@ def get_aidetect():
 def get_disableai():
     global useai
     useai = useai == False
+
+@app.get("/api/change")
+def changevideo(id: int):
+    global camera
+    camera = cv2.VideoCapture(id)
