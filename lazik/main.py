@@ -157,7 +157,9 @@ def status():
         "mem": mem,
         "uptime": uptime
     }
-camera = cv2.VideoCapture(0)
+camera1 = cv2.VideoCapture(0)
+camera2 = cv2.VideoCapture(1)
+camera = camera1
 
 latest_frame = None
 latest_frame_cpy = None
@@ -166,6 +168,7 @@ yolo_result = None         # optional: detections
 lock = threading.Lock()
 FPS = 15
 FRAME_TIME = 1.0 / FPS
+useai = False
 
 
 def capture_loops():
@@ -190,6 +193,9 @@ def yolo_loop():
     global yolo_frame, yolo_result
 
     while True:
+        if not useai:
+            time.sleep(0.1)
+            continue
         with lock:
             if latest_frame is None:
                 continue
@@ -215,7 +221,7 @@ def yolo_loop():
             yolo_frame = annotated
             yolo_result = detections
 
-        time.sleep(0.05)
+        time.sleep(0.1)
 
 
 @app.on_event("startup")
@@ -258,3 +264,17 @@ def get_aidetect():
             return {"error": "No YOLO frame available yet"}
         return  yolo_result
         
+@app.get("/api/disableai")
+def get_disableai():
+    global useai
+    useai = useai == False
+
+@app.get("/api/camswitch")
+def get_camswitch():
+    global camera
+    global camera2
+    global camera1
+    if camera == camera1:
+        camera = camera2
+    else:
+        camera = camera1

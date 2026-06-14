@@ -5,6 +5,8 @@ import { CameraWidget } from "./CameraWidget";
 import Joystick from "./Joystick";
 import { GearWidget } from "./GearWidget";
 import { DetectionWidget } from "./DetectionWidget";
+import { AiToggleWidget } from "./AiToggleWidget";
+import { CamSwitchWidget } from "./CamSwitchWidget";
 
 
 export function Widgets(ip: string): WidgetData[] {
@@ -50,6 +52,18 @@ export function Widgets(ip: string): WidgetData[] {
 			height: 220
 		},
 		{
+			id: "switchcamera",
+			content: (
+				<CamSwitchWidget endpoint={ip} />
+			),
+			x: 20,
+			y: 20,
+			width: 280,
+			ip: ip,
+			title: "camera switch",
+			height: 220
+		},
+		{
 			id: "aicamera",
 			content: (
 				<CameraWidget endpoint={ip + "/aicam"}></CameraWidget>
@@ -79,6 +93,18 @@ export function Widgets(ip: string): WidgetData[] {
 			title: "gear System",
 			content: (
 				<GearWidget endpoint={ip} />
+			),
+			x: 20,
+			y: 20,
+			width: 300,
+			ip: ip,
+			height: 230
+		},
+		{
+			id: "aitoggle",
+			title: "Ai toggle",
+			content: (
+				<AiToggleWidget endpoint={ip} />
 			),
 			x: 20,
 			y: 20,
