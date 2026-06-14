@@ -113,6 +113,18 @@ export function Widgets(ip: string): WidgetData[] {
 			height: 230
 		},
 		{
+			id: "camswitch",
+			title: "Ai toggle",
+			content: (
+				<CamSwitchWidget endpoint={ip} />
+			),
+			x: 20,
+			y: 20,
+			width: 300,
+			ip: ip,
+			height: 230
+		},
+		{
 			id: "detection",
 			title: "AI detection",
 			content: (
