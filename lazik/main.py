@@ -175,12 +175,14 @@ def capture_loops():
 
     while True:
         start = time.time()
+        try:
+            ret, frame = camera.read()
 
-        ret, frame = camera.read()
-
-        if ret:
-            with lock:
-                latest_frame = frame.copy()   # RAW FRAME ONLY
+            if ret:
+                with lock:
+                    latest_frame = frame.copy()   # RAW FRAME ONLY
+        except:
+            pass
 
         elapsed = time.time() - start
         sleep_time = FRAME_TIME - elapsed
@@ -192,34 +194,37 @@ def yolo_loop():
     global yolo_frame, yolo_result
 
     while True:
-        if not useai:
-            time.sleep(0.1)
-            continue
-        with lock:
-            if latest_frame is None:
+        try:
+            if not useai:
+                time.sleep(0.1)
                 continue
-            frame = latest_frame.copy()
+            with lock:
+                if latest_frame is None:
+                    continue
+                frame = latest_frame.copy()
 
-        results = model(frame, verbose=False)
-        result = results[0]
+            results = model(frame, verbose=False)
+            result = results[0]
 
-        annotated = result.plot()
+            annotated = result.plot()
 
-        detections = []
+            detections = []
 
-        for box in result.boxes:
-            cls_id = int(box.cls[0])
-            conf = float(box.conf[0])
+            for box in result.boxes:
+                cls_id = int(box.cls[0])
+                conf = float(box.conf[0])
 
-            detections.append({
-                "class": model.names[cls_id],
-                "confidence": round(conf, 3)
-            })
+                detections.append({
+                    "class": model.names[cls_id],
+                    "confidence": round(conf, 3)
+                })
 
-        with lock:
-            yolo_frame = annotated
-            yolo_result = detections
+            with lock:
+                yolo_frame = annotated
+                yolo_result = detections
 
+        except:
+            time.sleep(0.1)
         time.sleep(0.1)
 
 
@@ -270,5 +275,8 @@ def get_disableai():
 
 @app.get("/api/change")
 def changevideo(id: int):
-    global camera
-    camera = cv2.VideoCapture(id)
+    try:
+        global camera
+        camera = cv2.VideoCapture(id)
+    except:
+        pass
