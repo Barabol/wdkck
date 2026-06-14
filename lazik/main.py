@@ -158,34 +158,8 @@ def status():
         "mem": mem,
         "uptime": uptime
     }
-def find_cameras():
-    devices = sorted(glob.glob("/dev/video*"))
-    working = []
 
-    for dev in devices:
-        cap = cv2.VideoCapture(dev, cv2.CAP_V4L2)
-        if cap.isOpened():
-            ret, frame = cap.read()
-            if ret:
-                working.append(dev)
-        cap.release()
-
-    return working
-
-
-devices = find_cameras()
-
-print("Detected cameras:", devices)
-
-if len(devices) >= 2:
-    camera1 = cv2.VideoCapture(devices[0])
-    camera2 = cv2.VideoCapture(devices[1])
-elif len(devices) == 1:
-    camera1 = cv2.VideoCapture(devices[0])
-    camera2 = camera1
-else:
-    raise RuntimeError("No cameras found")
-camera = camera1
+camera = cv2.VideoCapture(0)
 
 latest_frame = None
 latest_frame_cpy = None
@@ -294,13 +268,3 @@ def get_aidetect():
 def get_disableai():
     global useai
     useai = useai == False
-
-@app.get("/api/camswitch")
-def get_camswitch():
-    global camera
-    global camera2
-    global camera1
-    if camera == camera1:
-        camera = camera2
-    else:
-        camera = camera1
