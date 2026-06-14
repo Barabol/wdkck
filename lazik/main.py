@@ -159,7 +159,7 @@ def status():
     }
 camera1 = cv2.VideoCapture(0)
 camera2 = cv2.VideoCapture(0)
-for x in range(10):
+for x in range(4):
     c = cv2.VideoCapture(x+1)
     if(c.isOpened()):
         camera2 = c
