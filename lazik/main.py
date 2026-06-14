@@ -6,7 +6,6 @@ from datetime import datetime
 import cv2
 import threading
 from ultralytics import YOLO
-import glob
 
 model = YOLO("./yolo26n.pt")
 
